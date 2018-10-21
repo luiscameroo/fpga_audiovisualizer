@@ -7,3 +7,5 @@ Using a VGA Controller display the amplitude of a select bandwith of frequencies
 an FIR filter using a shift register. The FIR filters coefficients where calculated using Matlab. 
 
 Unfortunately, the chosen bandwiths were far too small leading to a skewed output since only a very small bandwidth of frequencies (40Hz) were being isolated. Therefore, unless the tones (like those found in the Tones folders) where used as inputs the Audiovisualizer did not match the expected output. 
+
+In the future, the bandwidths need to be much larger to allow for better visualization. In addition, a more accurate filter could be implemented by using a higher frequency digital signal to allow for better filtering. 
