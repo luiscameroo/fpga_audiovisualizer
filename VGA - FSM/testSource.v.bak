@@ -1,0 +1,49 @@
+`timescale 1ns/1ns
+
+module testFilterInput(
+	SW,
+	KEY,
+	newSample,
+	outAmpFreq,
+	);
+	
+	wire [3:0]selectTone; 
+	wire clk,
+		  start,
+		  resetn,
+		  clkFreq;
+		
+	
+	output[15:0] newSample;
+	output[23:0] outAmpFreq;
+	
+	input [9:0]SW;
+	input [3:0]KEY;
+	
+	assign clk = KEY[0];
+	assign clkFreq = KEY[1];
+	assign resetn = KEY[2];
+	assign start = KEY[3];
+	
+	assign selectTone = SW[3:0]; 
+	
+	always@(posedge clkFreq)
+	begin
+		if(!resetn)
+			address <= 0; 
+		else 
+			address <= address + 1; 
+	end
+	
+	
+	filterInput Source(
+		.clk(clk),
+		.clkFreq(clkFreq),
+		.outAmpFreq(outAmpFreq),
+		.selectTone(selectTone), 
+		.resetn(resetn), 
+		.start(start),
+		.rawSample(newSample)
+		);
+
+endmodule 

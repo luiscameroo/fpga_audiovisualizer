@@ -1,0 +1,106 @@
+`timescale 1ns/1ns
+
+module audiovisualizer(
+	KEY,
+	SW,
+	CLOCK_50,
+	VGA_CLK,   						
+	VGA_HS,							
+	VGA_VS,							
+	VGA_BLANK_N,					
+	VGA_SYNC_N,						
+	VGA_R,   						
+	VGA_G,	 						
+	VGA_B,
+	AUD_ADCDAT,
+	AUD_BCLK,
+	AUD_ADCLRCK,
+	AUD_DACLRCK,
+	FPGA_I2C_SDAT,
+	AUD_XCK,
+	AUD_DACDAT,
+	FPGA_I2C_SCLK
+	);
+	
+	input [1:0]KEY;
+	input [3:0]SW;
+	input CLOCK_50;
+	
+	output			VGA_CLK;   				//	VGA Clock
+	output			VGA_HS;					//	VGA H_SYNC
+	output			VGA_VS;					//	VGA V_SYNC
+	output			VGA_BLANK_N;				//	VGA BLANK
+	output			VGA_SYNC_N;				//	VGA SYNC
+	output	[9:0]	VGA_R;   				//	VGA Red[9:0]
+	output	[9:0]	VGA_G;	 				//	VGA Green[9:0]
+	output	[9:0]	VGA_B;  
+	
+	input				AUD_ADCDAT;
+	inout				AUD_BCLK;
+	inout				AUD_ADCLRCK;
+	inout				AUD_DACLRCK;
+	inout				FPGA_I2C_SDAT;
+	output				AUD_XCK;
+	output				AUD_DACDAT;
+	output				FPGA_I2C_SCLK;
+	
+	
+	wire clk, 
+		  resetn,
+		  start;
+	
+	wire [3:0]selectTone; 
+	wire [15:0]rawSample;
+	
+	assign clk        = CLOCK_50;
+	assign resetn     = KEY[0];
+	assign start      = ~KEY[1];
+	assign selectTone = SW[3:0]; 
+	
+	wire [23:0]AmpFreq;
+	
+	
+	
+	filterInput Source(
+		.clk(clk),
+		.outAmpFreq(AmpFreq),
+		.selectTone(selectTone), 
+		.resetn(resetn), 
+		.start(start),
+		.rawSample(rawSample)
+		);
+		
+	visualOutput Visuals(
+		.clk(clk),
+		.resetn(resetn),
+		.start(start),
+		.inAmpFreq(AmpFreq),
+		.VGA_CLK(VGA_CLK),   						
+		.VGA_HS(VGA_HS),							
+		.VGA_VS(VGA_VS),							
+		.VGA_BLANK_N(VGA_BLANK_N),					
+		.VGA_SYNC_N(VGA_SYNC_N),						
+		.VGA_R(VGA_R),   						
+		.VGA_G(VGA_G),	 						
+		.VGA_B(VGA_B)  
+		);
+	
+	audioOutput audio(
+		.clk(clk),
+		.clkFreq(clkFreq),
+		.resetn(resetn),
+		.rawSample(rawSample),
+		.AUD_ADCDAT(AUD_ADCDAT),
+		
+		.AUD_BCLK(AUD_BCLK),
+		.AUD_ADCLRCK(AUD_ADCLRCK),
+		.AUD_DACLRCK(AUD_DACLRCK),
+		.FPGA_I2C_SDAT(FPGA_I2C_SDAT),
+		.AUD_XCK(AUD_XCK),
+		.AUD_DACDAT(AUD_DACDAT),
+		.FPGA_I2C_SCLK(FPGA_I2C_SCLK)
+		);
+		
+endmodule 
+	
+	
